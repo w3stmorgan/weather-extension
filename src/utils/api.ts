@@ -1,3 +1,4 @@
+//TODO: Change api key configurations
 const OPEN_WEATHER_API_KEY = '7bdeee8d663b099d290d1adb7c26749e';
 
 export interface OpenWeatherData {
