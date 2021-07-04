@@ -1,5 +1,7 @@
-body{
-    background-color: #f5f5f5;
-    width: 320px;
-    height: 512px;
+.weatherCard-title{
+    font-size: 24px !important;
+}
+
+.weatherCard-body{
+    font-size: 16px !important;
 }

@@ -1,10 +1,22 @@
-# React Chrome Extension Boilerplate
+# React Chrome Weather Extension
+
+## Concepts 
+1. Data Fetching via OpenWeather API
+2. Typescript, React and Webpack
+3. Chrome APIs (alarms, storage, etc...)
+4. Core Extension Concepts (popup, options, background script, content script)
+5. Material UI components
+
+## Features
+1. Display temperature of multiple cities based on user input
+2. Badge icon that updates hourly with temperature of users home city
+3. Weather overlay that can be displayed on a webpage as a user is browsing, controllable through popup
+4. Support for switching between metric and imperial temperature units
 
 ## Getting Started
 
 1. `npm i` to install dependancies
 2. `npm start` to start running the fast development mode Webpack build process that bundle files into the `dist` folder
-3. `npm i --save-dev <package_name>` to install new packages
 
 ## Loading The Chrome Extension
 
@@ -13,12 +25,6 @@
 3. Click `Load unpacked`
 4. Select the entire `dist` folder
 
-# Important Initial Steps
-
-1. `git init` to start a new git repo for tracking your changes, do an initial base commit with all the default files
-2. Update `package.json`, important fields include `author`, `version`, `name` and `description`
-3. Update `manifest.json`, important fields include `version`, `name` and `description`
-4. Update `webpack.commmon.js`, the title in the `getHtmlPlugins` function should be your extension name
 
 # Production Build
 
