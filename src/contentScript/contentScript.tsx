@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { Card } from '@material-ui/core';
 import WeatherCard from '../components/WeatherCard';
 import { getStoredOptions, LocalStorageOptions } from '../utils/storage';
-import { Messages } from '../utils/messages'
+import { Messages } from '../utils/messages';
 import './contentScript.css';
 
 const App: React.FC<{}> = () => {
@@ -11,26 +11,35 @@ const App: React.FC<{}> = () => {
   const [isActive, setIsActive] = useState<boolean>(false);
   useEffect(() => {
     getStoredOptions().then((options) => {
-      setOptions(options)
-      setIsActive(options.hasAutoOverlay)
-    })
-  }, [])
+      setOptions(options);
+      setIsActive(options.hasAutoOverlay);
+    });
+  }, []);
+
+  const handleMessages = (msg: Messages) => {
+    if (msg === Messages.TOGGLE_OVERLAY) {
+      setIsActive(!isActive);
+    }
+  };
 
   useEffect(() => {
-    chrome.runtime.onMessage.addListener((msg) => {
-      if(msg === Messages.TOGGLE_OVERLAY){
-        setIsActive(!isActive)
-      }
-    })
-  }, [isActive])
-  if (!options) { 
+    chrome.runtime.onMessage.addListener(handleMessages);
+    return () => {
+      chrome.runtime.onMessage.removeListener(handleMessages);
+    };
+  }, [isActive]);
+  if (!options) {
     return null;
   }
   return (
     <>
       {isActive && (
         <Card className="overlayCard">
-          <WeatherCard city={options.homeCity} tempScale={options.tempScale} onDelete={() => setIsActive(false)} />
+          <WeatherCard
+            city={options.homeCity}
+            tempScale={options.tempScale}
+            onDelete={() => setIsActive(false)}
+          />
         </Card>
       )}
     </>

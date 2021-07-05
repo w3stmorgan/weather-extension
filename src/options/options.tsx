@@ -17,6 +17,7 @@ import {
   setStoredOptions,
   LocalStorageOptions,
 } from '../utils/storage';
+import { fetchOpenWeatherData, getWeatherIcon } from '../utils/api';
 
 type FormState = 'ready' | 'saving';
 
@@ -47,6 +48,19 @@ const App: React.FC<{}> = () => {
       setTimeout(() => {
         setFormState('ready');
       }, 1000);
+    });
+    getStoredOptions().then((options) => {
+      if (options.homeCity === '') {
+        return;
+      }
+      fetchOpenWeatherData(options.homeCity, options.tempScale).then((data) => {
+        const temp = Math.round(data.main.temp);
+        const symbol = options.tempScale === 'metric' ? '\u2103' : '\u2109';
+        chrome.action.setBadgeText({
+          text: `${temp}${symbol}`,
+        });
+        chrome.action.setIcon({path: getWeatherIcon(data.weather[0].icon)})
+      });
     });
   };
 

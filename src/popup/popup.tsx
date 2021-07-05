@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { Box, Grid, InputBase, IconButton, Paper } from '@material-ui/core';
-import { Add as AddIcon, PictureInPicture as PictureInPictureIcon } from '@material-ui/icons';
+import {
+  Add as AddIcon,
+  PictureInPicture as PictureInPictureIcon,
+} from '@material-ui/icons';
 import 'fontsource-roboto';
 import './popup.css';
 import WeatherCard from '../components/WeatherCard';
@@ -12,7 +15,7 @@ import {
   getStoredOptions,
   LocalStorageOptions,
 } from '../utils/storage';
-import { OpenWeatherTempScale } from '../utils/api';
+import { fetchOpenWeatherData, OpenWeatherTempScale } from '../utils/api';
 import { Messages } from '../utils/messages';
 
 const App: React.FC<{}> = () => {
@@ -44,21 +47,36 @@ const App: React.FC<{}> = () => {
   const handleTempScaleButtonClick = () => {
     const updatedOptions: LocalStorageOptions = {
       ...options,
-      tempScale: options.tempScale === 'metric' ? 'imperial' : 'metric'
-    }
+      tempScale: options.tempScale === 'metric' ? 'imperial' : 'metric',
+    };
     setStoredOptions(updatedOptions).then(() => {
-      setOptions(updatedOptions)
-    })
-  }
-  const handleOverlayButtonClick = () => {
-    chrome.tabs.query({
-      active: true,
-    }, (tabs) => {
-      if(tabs.length > 0){
-        chrome.tabs.sendMessage(tabs[0].id, Messages.TOGGLE_OVERLAY)
+      setOptions(updatedOptions);
+    });
+    getStoredOptions().then((options) => {
+      if (options.homeCity === '') {
+        return;
       }
-    })
-  }
+      fetchOpenWeatherData(options.homeCity, options.tempScale).then((data) => {
+        const temp = Math.round(data.main.temp);
+        const symbol = options.tempScale === 'metric' ? '\u2103' : '\u2109';
+        chrome.action.setBadgeText({
+          text: `${temp}${symbol}`,
+        });
+      });
+    });
+  };
+  const handleOverlayButtonClick = () => {
+    chrome.tabs.query(
+      {
+        active: true,
+      },
+      (tabs) => {
+        if (tabs.length > 0) {
+          chrome.tabs.sendMessage(tabs[0].id, Messages.TOGGLE_OVERLAY);
+        }
+      }
+    );
+  };
   if (!options) {
     return null;
   }
@@ -81,7 +99,7 @@ const App: React.FC<{}> = () => {
         </Grid>
         <Grid item>
           <Paper>
-            <Box py='3px'>
+            <Box py="3px">
               <IconButton onClick={handleTempScaleButtonClick}>
                 {options.tempScale === 'metric' ? '\u2103' : '\u2109'}
               </IconButton>
@@ -90,7 +108,7 @@ const App: React.FC<{}> = () => {
         </Grid>
         <Grid item>
           <Paper>
-            <Box py='3px'>
+            <Box py="3px">
               <IconButton onClick={handleOverlayButtonClick}>
                 <PictureInPictureIcon />
               </IconButton>
@@ -98,13 +116,12 @@ const App: React.FC<{}> = () => {
           </Paper>
         </Grid>
       </Grid>
-      {
-        options.homeCity != '' &&
-        <WeatherCard city={options.homeCity} tempScale={options.tempScale}/>
-      }
+      {options.homeCity != '' && (
+        <WeatherCard city={options.homeCity} tempScale={options.tempScale} />
+      )}
       {cities.map((city, index) => (
         <WeatherCard
-          city={city} 
+          city={city}
           tempScale={options.tempScale}
           key={index}
           onDelete={() => handleCityDeleteButtonClick(index)}
